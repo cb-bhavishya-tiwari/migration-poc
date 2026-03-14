@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "capture:screenshots": "node capture-pricing-screenshots.js"
+    "capture:screenshots": "node scripts/capture-pricing-screenshots.js"
   },
   "dependencies": {
     "playwright-core": "^1.58.2"

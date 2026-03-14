@@ -1,4 +1,4 @@
-const FEATURE_DATA_URL = "./pricing-card-features.json";
+const FEATURE_DATA_URL = "../data/pricing-card-features.json";
 const HOSTED_PAGE_URL =
   "http://localhost:8764/sites/01KKEZN9VSGC0AKPZ5DH1QRXT5/pricing/01KKPKDBMGFKEG43KRBEF7ZPW1";
 const MESSAGE_TYPE = "pricify.hosted.page.setFeatureForPricingCard";

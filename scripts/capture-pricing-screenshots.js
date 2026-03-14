@@ -3,9 +3,9 @@ const http = require("node:http");
 const path = require("node:path");
 const { chromium } = require("playwright-core");
 
-const projectRoot = __dirname;
-const featureDataPath = path.join(projectRoot, "pricing-card-features.json");
-const screenshotDir = path.join(projectRoot, "screenshots");
+const projectRoot = path.resolve(__dirname, "..");
+const featureDataPath = path.join(projectRoot, "data", "pricing-card-features.json");
+const screenshotDir = path.join(projectRoot, "assets", "screenshots");
 const iframeUrl =
   "http://localhost:8764/sites/01KKEZN9VSGC0AKPZ5DH1QRXT5/pricing/01KKPKDBMGFKEG43KRBEF7ZPW1";
 const viewport = { width: 1440, height: 1400 };
@@ -37,7 +37,7 @@ function createStaticServer(rootDir) {
     try {
       const requestUrl = new URL(request.url, "http://127.0.0.1");
       const relativePath =
-        requestUrl.pathname === "/" ? "/index.html" : decodeURIComponent(requestUrl.pathname);
+        requestUrl.pathname === "/" ? "/app/index.html" : decodeURIComponent(requestUrl.pathname);
       const normalizedPath = path.normalize(relativePath).replace(/^(\.\.[/\\])+/, "");
       const filePath = path.join(rootDir, normalizedPath);
 
@@ -74,7 +74,7 @@ function slugify(value) {
 }
 
 function getFeaturePageUrl(baseUrl, featureId) {
-  return `${baseUrl}/index.html?featureId=${encodeURIComponent(featureId)}`;
+  return `${baseUrl}/app/index.html?featureId=${encodeURIComponent(featureId)}`;
 }
 
 function getScreenshotPath(featureId) {
@@ -171,7 +171,7 @@ async function main() {
   const featureConfigs = JSON.parse(await fs.readFile(featureDataPath, "utf8"));
 
   if (!Array.isArray(featureConfigs) || featureConfigs.length === 0) {
-    throw new Error("pricing-card-features.json must contain at least one feature configuration.");
+    throw new Error("data/pricing-card-features.json must contain at least one feature configuration.");
   }
 
   await fs.mkdir(screenshotDir, { recursive: true });
