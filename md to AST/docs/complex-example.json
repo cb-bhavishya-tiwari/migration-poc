@@ -1,0 +1,267 @@
+{
+    "type": "root",
+    "children": [
+      
+      // ========================================
+      // 1. IMAGE: ![aa](url)
+      // ========================================
+      {
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "image",
+            "url": "https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80",
+            "alt": "aa",
+            "title": null
+          }
+        ]
+      },
+      
+      // ========================================
+      // 2. PARAGRAPH: "This is **a parrot**"
+      // ========================================
+      {
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "text",
+            "value": "This is "
+          },
+          {
+            "type": "strong",
+            "children": [
+              {
+                "type": "text",
+                "value": "a parrot"
+              }
+            ]
+          }
+        ]
+      },
+      
+      // ========================================
+      // 3. NESTED FORMATTING: "Is *this a **parror***"
+      // (italic with bold inside)
+      // ========================================
+      {
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "text",
+            "value": "Is "
+          },
+          {
+            "type": "emphasis",
+            "children": [
+              {
+                "type": "text",
+                "value": "this a "
+              },
+              {
+                "type": "strong",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "parror"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      
+      // ========================================
+      // 4. TOOLTIP IN PARAGRAPH: "*I am a* [tooltip]{Toolyip wala texr}"
+      // (italic text + custom tooltip)
+      // ========================================
+      {
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "emphasis",
+            "children": [
+              {
+                "type": "text",
+                "value": "I am a"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "value": " "
+          },
+          {
+            "type": "tooltip",
+            "text": "tooltip",
+            "tooltip": "Toolyip wala texr"
+          }
+        ]
+      },
+      
+      // ========================================
+      // 5. ORDERED LIST (5 items)
+      // ========================================
+      {
+        "type": "list",
+        "ordered": true,
+        "start": 1,
+        "spread": false,
+        "children": [
+          
+          // List item 1: "🤣😍 I am 1"
+          {
+            "type": "listItem",
+            "spread": false,
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "🤣😍 I am 1"
+                  }
+                ]
+              }
+            ]
+          },
+          
+          // List item 2: "sdsdasdasdasdas"
+          {
+            "type": "listItem",
+            "spread": false,
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "sdsdasdasdasdas"
+                  }
+                ]
+              }
+            ]
+          },
+          
+          // List item 3: "asdsadsadsadas"
+          {
+            "type": "listItem",
+            "spread": false,
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "asdsadsadsadas"
+                  }
+                ]
+              }
+            ]
+          },
+          
+          // List item 4: "sadasdasdsadsad **asdadssadasd**"
+          {
+            "type": "listItem",
+            "spread": false,
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "sadasdasdsadsad "
+                  },
+                  {
+                    "type": "strong",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "asdadssadasd"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          
+          // List item 5: "[sadasdasd](https://google.com)"
+          {
+            "type": "listItem",
+            "spread": false,
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "link",
+                    "url": "https://google.com",
+                    "title": null,
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "sadasdasd"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      
+      // ========================================
+      // 6. BLOCKQUOTE WITH TOOLTIP INSIDE! 🎯
+      // "> axaxaxa[xaxax]{Tooltip text}"
+      // ========================================
+      {
+        "type": "blockquote",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "axaxaxa"
+              },
+              {
+                "type": "tooltip",
+                "text": "xaxax",
+                "tooltip": "Tooltip text"
+              }
+            ]
+          }
+        ]
+      },
+      
+      // ========================================
+      // 7. PLAIN PARAGRAPH: "axs"
+      // ========================================
+      {
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "text",
+            "value": "axs"
+          }
+        ]
+      },
+      
+      // ========================================
+      // 8. ANOTHER IMAGE: ![aa](url)
+      // ========================================
+      {
+        "type": "paragraph",
+        "children": [
+          {
+            "type": "image",
+            "url": "https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg",
+            "alt": "aa",
+            "title": null
+          }
+        ]
+      }
+    ]
+  }
