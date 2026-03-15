@@ -1303,6 +1303,551 @@ FORCE_REMIGRATE=true node run-migration.js
 
 ---
 
+## Real-World Example: Complex Markdown Migration
+
+Let's walk through a **complete real-world example** showing how your actual database markdown gets processed step-by-step.
+
+### Raw Database String
+
+This is what's actually stored in your database:
+
+```javascript
+const rawFromDB = "![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)\n\nThis is **a parrot**\n\nIs *this a **parror***\n\n*I am a* [tooltip]{Toolyip wala texr}\n\n1. 🤣😍 I am 1\n\n2. sdsdasdasdasdas\n\n3. asdsadsadsadas\n\n4. sadasdasdsadsad **asdadssadasd**\n\n5. [sadasdasd](https://google.com)\n\n> axaxaxa[xaxax]{Tooltip text}\n\naxs\n\n![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)"
+```
+
+When rendered as markdown, this becomes:
+
+```markdown
+![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)
+
+This is **a parrot**
+
+Is *this a **parror***
+
+*I am a* [tooltip]{Toolyip wala texr}
+
+1. 🤣😍 I am 1
+
+2. sdsdasdasdasdas
+
+3. asdsadsadsadas
+
+4. sadasdasdsadsad **asdadssadasd**
+
+5. [sadasdasd](https://google.com)
+
+> axaxaxa[xaxax]{Tooltip text}
+
+axs
+
+![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)
+```
+
+### Step 1: Preprocessing with formatMarkdown()
+
+**Input:** Raw database string  
+**Process:** Apply `formatMarkdown()` normalization  
+**Output:** Standard CommonMark markdown
+
+```javascript
+import {formatMarkdown} from './src/client/lib/markdown-helper.js'
+
+const normalized = formatMarkdown(rawFromDB)
+```
+
+**After preprocessing:**
+```markdown
+![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)
+
+This is **a parrot**
+
+Is *this a **parror***
+
+*I am a* [tooltip]{Toolyip wala texr}
+
+1. 🤣😍 I am 1
+
+2. sdsdasdasdasdas
+
+3. asdsadsadsadas
+
+4. sadasdasdsadsad **asdadssadasd**
+
+5. [sadasdasd](https://google.com)
+
+> axaxaxa[xaxax]{Tooltip text}
+
+axs
+
+![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)
+```
+
+**What changed:**
+- ✅ Emojis already rendered (🤣😍) - preserved as-is
+- ✅ Spacing normalized to double newlines
+- ✅ No `===` headings or `:emoji:` codes in this example
+
+### Step 2: Parse to MDAST
+
+**Input:** Normalized markdown  
+**Process:** Parse with `unified` + `remarkParse` + `remarkGfm` + `remarkTooltip`
+
+```javascript
+import {unified} from 'unified'
+import remarkParse from 'remark-parse'
+import remarkGfm from 'remark-gfm'
+import {remarkTooltip} from './plugins/remark-tooltip.js'
+
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkTooltip)  // Custom plugin for [text]{tooltip}
+
+const ast = processor.parse(normalized)
+```
+
+### Step 3: Resulting MDAST Structure
+
+Here's the complete AST output with **annotations** explaining each part:
+
+```javascript
+{
+  "type": "root",
+  "children": [
+    // 1. First Image
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "image",
+          "url": "https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80",
+          "alt": "aa",
+          "title": null
+        }
+      ]
+    },
+    
+    // 2. "This is **a parrot**"
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "This is "
+        },
+        {
+          "type": "strong",           // **bold**
+          "children": [
+            {
+              "type": "text",
+              "value": "a parrot"
+            }
+          ]
+        }
+      ]
+    },
+    
+    // 3. "Is *this a **parror***" (nested emphasis + strong)
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Is "
+        },
+        {
+          "type": "emphasis",         // *italic*
+          "children": [
+            {
+              "type": "text",
+              "value": "this a "
+            },
+            {
+              "type": "strong",       // **bold** INSIDE italic
+              "children": [
+                {
+                  "type": "text",
+                  "value": "parror"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    
+    // 4. "*I am a* [tooltip]{Toolyip wala texr}" (italic + custom tooltip)
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "emphasis",         // *I am a*
+          "children": [
+            {
+              "type": "text",
+              "value": "I am a"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "value": " "
+        },
+        {
+          "type": "tooltip",          // ← CUSTOM NODE from remarkTooltip plugin!
+          "text": "tooltip",
+          "tooltip": "Toolyip wala texr"
+        }
+      ]
+    },
+    
+    // 5. Ordered List (numbered)
+    {
+      "type": "list",
+      "ordered": true,
+      "start": 1,
+      "spread": false,
+      "children": [
+        // List item 1: "🤣😍 I am 1"
+        {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "🤣😍 I am 1"  // Emojis preserved as unicode
+                }
+              ]
+            }
+          ]
+        },
+        // List item 2: "sdsdasdasdasdas"
+        {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "sdsdasdasdasdas"
+                }
+              ]
+            }
+          ]
+        },
+        // List item 3: "asdsadsadsadas"
+        {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "asdsadsadsadas"
+                }
+              ]
+            }
+          ]
+        },
+        // List item 4: "sadasdasdsadsad **asdadssadasd**"
+        {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "sadasdasdsadsad "
+                },
+                {
+                  "type": "strong",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "asdadssadasd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        // List item 5: "[sadasdasd](https://google.com)"
+        {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "link",      // Standard markdown link
+                  "url": "https://google.com",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "sadasdasd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    
+    // 6. Blockquote with tooltip INSIDE it
+    {
+      "type": "blockquote",           // > quote
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "axaxaxa"
+            },
+            {
+              "type": "tooltip",      // ← Tooltip INSIDE blockquote!
+              "text": "xaxax",
+              "tooltip": "Tooltip text"
+            }
+          ]
+        }
+      ]
+    },
+    
+    // 7. Plain text paragraph "axs"
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "axs"
+        }
+      ]
+    },
+    
+    // 8. Second Image
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "image",
+          "url": "https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg",
+          "alt": "aa",
+          "title": null
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Key Features Demonstrated
+
+This example showcases:
+
+✅ **Images** - Standard markdown `![alt](url)` → `image` nodes  
+✅ **Bold text** - `**text**` → `strong` nodes  
+✅ **Italic text** - `*text*` → `emphasis` nodes  
+✅ **Nested formatting** - `*this a **bold***` → nested `emphasis` > `strong`  
+✅ **Custom tooltips** - `[text]{tooltip}` → custom `tooltip` nodes  
+✅ **Emoji unicode** - `🤣😍` preserved as text values  
+✅ **Ordered lists** - `1. item` → `list` (ordered: true) with `listItem` children  
+✅ **Links** - `[text](url)` → `link` nodes  
+✅ **Blockquotes** - `> text` → `blockquote` nodes  
+✅ **Tooltip in blockquote** - Custom syntax works inside standard markdown structures  
+
+### Complete Migration Code
+
+Here's the full code to migrate this example:
+
+```javascript
+import {unified} from 'unified'
+import remarkParse from 'remark-parse'
+import remarkGfm from 'remark-gfm'
+import {remarkTooltip} from './plugins/remark-tooltip.js'
+import {formatMarkdown} from './src/client/lib/markdown-helper.js'
+
+async function migrateComplexExample() {
+  const rawFromDB = "![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)\n\nThis is **a parrot**\n\nIs *this a **parror***\n\n*I am a* [tooltip]{Toolyip wala texr}\n\n1. 🤣😍 I am 1\n\n2. sdsdasdasdasdas\n\n3. asdsadsadsadas\n\n4. sadasdasdsadsad **asdadssadasd**\n\n5. [sadasdasd](https://google.com)\n\n> axaxaxa[xaxax]{Tooltip text}\n\naxs\n\n![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)"
+  
+  console.log('=== STEP 1: Raw from Database ===')
+  console.log(rawFromDB)
+  
+  // Step 1: Preprocess
+  const normalized = formatMarkdown(rawFromDB)
+  console.log('\n=== STEP 2: After formatMarkdown() ===')
+  console.log(normalized)
+  
+  // Step 2: Parse to AST
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkTooltip)  // Custom plugin
+  
+  const ast = processor.parse(normalized)
+  
+  console.log('\n=== STEP 3: MDAST Output ===')
+  console.log(JSON.stringify(ast, null, 2))
+  
+  // Step 3: Validate
+  console.log('\n=== STEP 4: Validation ===')
+  console.log('✅ Root type:', ast.type)
+  console.log('✅ Total children:', ast.children.length)
+  console.log('✅ Has images:', ast.children.some(n => 
+    n.children?.[0]?.type === 'image'
+  ))
+  console.log('✅ Has tooltips:', JSON.stringify(ast).includes('"type":"tooltip"'))
+  console.log('✅ Has blockquote:', ast.children.some(n => n.type === 'blockquote'))
+  console.log('✅ Has ordered list:', ast.children.some(n => 
+    n.type === 'list' && n.ordered === true
+  ))
+  
+  return ast
+}
+
+// Run it
+migrateComplexExample()
+```
+
+### Visual Breakdown: What Goes Where
+
+```
+Raw Markdown                          →  MDAST Node Type
+─────────────────────────────────────────────────────────────────
+![aa](url)                            →  paragraph > image
+This is **a parrot**                  →  paragraph > text + strong
+Is *this a **parror***                →  paragraph > text + emphasis > strong
+*I am a* [tooltip]{text}              →  paragraph > emphasis + tooltip (custom!)
+1. 🤣😍 I am 1                        →  list (ordered) > listItem > paragraph
+5. [link](url)                        →  list > listItem > paragraph > link
+> axaxaxa[xaxax]{Tooltip text}        →  blockquote > paragraph > text + tooltip
+axs                                   →  paragraph > text
+![aa](url)                            →  paragraph > image
+```
+
+### Important Notes
+
+#### 1. Tooltip Inside Blockquote
+
+Notice that `> axaxaxa[xaxax]{Tooltip text}` creates:
+
+```json
+{
+  "type": "blockquote",
+  "children": [
+    {
+      "type": "paragraph",
+      "children": [
+        {"type": "text", "value": "axaxaxa"},
+        {"type": "tooltip", "text": "xaxax", "tooltip": "Tooltip text"}
+      ]
+    }
+  ]
+}
+```
+
+**The tooltip plugin works INSIDE other markdown structures!** This is because micromark processes inline content (like tooltips) within block structures (like blockquotes).
+
+#### 2. Nested Formatting
+
+The text `*this a **parror***` shows **nested** emphasis and strong:
+
+```json
+{
+  "type": "emphasis",
+  "children": [
+    {"type": "text", "value": "this a "},
+    {
+      "type": "strong",
+      "children": [
+        {"type": "text", "value": "parror"}
+      ]
+    }
+  ]
+}
+```
+
+MDAST naturally handles nesting!
+
+#### 3. Emoji Preservation
+
+Native emojis `🤣😍` are preserved as unicode text:
+
+```json
+{
+  "type": "text",
+  "value": "🤣😍 I am 1"
+}
+```
+
+No special handling needed - they're just characters!
+
+### Testing Your Migration
+
+Use this example to test your migration pipeline:
+
+```javascript
+// test-complex-migration.js
+import {migrateMarkdownToAST} from './migrate-markdown-to-ast.js'
+
+const testCase = "![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)\n\nThis is **a parrot**\n\nIs *this a **parror***\n\n*I am a* [tooltip]{Toolyip wala texr}\n\n1. 🤣😍 I am 1\n\n2. sdsdasdasdasdas\n\n3. asdsadsadsadas\n\n4. sadasdasdsadsad **asdadssadasd**\n\n5. [sadasdasd](https://google.com)\n\n> axaxaxa[xaxax]{Tooltip text}\n\naxs\n\n![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)"
+
+async function test() {
+  const ast = await migrateMarkdownToAST(testCase)
+  
+  // Validate all expected elements
+  const checks = {
+    hasImages: JSON.stringify(ast).includes('"type":"image"'),
+    hasTooltips: JSON.stringify(ast).includes('"type":"tooltip"'),
+    hasBlockquote: JSON.stringify(ast).includes('"type":"blockquote"'),
+    hasList: JSON.stringify(ast).includes('"type":"list"'),
+    hasLinks: JSON.stringify(ast).includes('"type":"link"'),
+    hasStrong: JSON.stringify(ast).includes('"type":"strong"'),
+    hasEmphasis: JSON.stringify(ast).includes('"type":"emphasis"'),
+  }
+  
+  console.log('Migration Test Results:')
+  Object.entries(checks).forEach(([name, passed]) => {
+    console.log(`${passed ? '✅' : '❌'} ${name}`)
+  })
+  
+  if (Object.values(checks).every(Boolean)) {
+    console.log('\n🎉 All checks passed!')
+  } else {
+    console.log('\n⚠️  Some checks failed')
+  }
+}
+
+test()
+```
+
+### Success Criteria
+
+Your migration is successful when:
+
+✅ All 8 top-level nodes are present (2 images, 5 paragraphs, 1 list, 1 blockquote)  
+✅ Custom tooltip nodes are created for both `[tooltip]{text}` instances  
+✅ Tooltip inside blockquote is properly nested  
+✅ Nested formatting (emphasis + strong) is preserved  
+✅ Emojis remain as unicode text  
+✅ Links have proper `url` properties  
+✅ Ordered list has `ordered: true` and 5 list items  
+
+---
+
 ## Resources
 
 ### 📚 Start Here (Your Custom Learning Guide)
