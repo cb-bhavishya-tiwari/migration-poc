@@ -193,3 +193,194 @@ The API may have rate limits. If you encounter 429 errors, reduce `NUM_PROCESSES
 - **No race conditions**: Processes run in parallel, but file writes are sequential
 - **Atomic writes**: Each round completes fully before writing
 - **Valid JSON**: Output is always a properly formatted JSON array
+
+---
+
+# Pricing Features Processing Pipeline
+
+After fetching the pricing features, you can process them through a markdown formatting and AST conversion pipeline.
+
+## What the Pipeline Does
+
+The `process_features_pipeline.js` script processes each feature through a complete pipeline:
+
+1. **Read Features**: Loads `pricing_features_output.json` 
+2. **Format Markdown**: Applies `formatMarkdown()` to normalize each feature string
+   - Converts Setext headings (===) to ATX headings (#)
+   - Normalizes spacing
+   - Converts double-underscore bold to asterisk bold
+   - Converts emoji shortcodes to native emoji
+3. **Generate AST**: Parses formatted markdown to Abstract Syntax Tree
+4. **Convert Back**: Converts AST back to markdown
+5. **Output Comparison**: Creates JSON with both versions for validation
+
+## Output Format
+
+```json
+{
+  "meta": {
+    "generatedAt": "2026-03-16T00:00:00.000Z",
+    "inputFile": "pricing_features_output.json",
+    "totalPricingPages": 328,
+    "totalFeatures": 2156,
+    "processedFeatures": 2156,
+    "errorCount": 0,
+    "pipeline": "formatMarkdown → AST → markdown"
+  },
+  "data": [
+    {
+      "pricingPageId": "01JXJE4HENFW7A51F6QP80G4QY",
+      "features": {
+        "feat1": {
+          "rawMD": "# What's included\n\n...",
+          "ASTtoMD": "# What's included\n\n..."
+        },
+        "feat2": {
+          "rawMD": "# What's included\n\n...",
+          "ASTtoMD": "# What's included\n\n..."
+        }
+      }
+    }
+  ]
+}
+```
+
+## Prerequisites
+
+Make sure you have the required dependencies installed in the parent directory:
+
+```bash
+cd "md to AST"
+npm install
+```
+
+Required packages (should already be in package.json):
+- `unified`
+- `remark-parse`
+- `remark-stringify`
+- `remark-gfm`
+- `@emoji-mart/data`
+
+## How to Run the Pipeline
+
+### Step 1: Fetch Pricing Features (if not done already)
+
+```bash
+python3 fetch_pricing_features.py
+```
+
+This creates `pricing_features_output.json`.
+
+### Step 2: Process Through Pipeline
+
+```bash
+node process_features_pipeline.js
+```
+
+Or specify a custom input file:
+
+```bash
+node process_features_pipeline.js custom-features.json
+```
+
+### Output
+
+The pipeline creates `pricing_features_processed.json` with:
+- **rawMD**: Feature text after `formatMarkdown()` preprocessing
+- **ASTtoMD**: Feature text after AST conversion (roundtrip)
+
+## Use Cases
+
+### 1. Validation
+Compare `rawMD` vs `ASTtoMD` to ensure AST conversion preserves markdown structure:
+
+```bash
+node process_features_pipeline.js
+# Check output to compare both versions
+```
+
+### 2. Migration Testing
+Test if your markdown can survive the full AST conversion pipeline before migrating to production.
+
+### 3. Debugging
+Identify which features have markdown that doesn't roundtrip correctly through AST conversion.
+
+## Example Console Output
+
+```
+════════════════════════════════════════════════════════════
+  PRICING FEATURES PIPELINE: Markdown → AST → Markdown
+════════════════════════════════════════════════════════════
+
+📄 Reading input file: pricing_features_output.json
+✅ Loaded 328 pricing pages
+
+⚙️  Creating markdown processors...
+✅ Processors ready
+
+🔄 Processing features through pipeline...
+  [1/328] Processing 01JXJE4HENFW7A51F6QP80G4QY (3 features)
+  [2/328] Processing 01JNJSG972BKD0ECEXS8NDG3F6 (4 features)
+  ...
+
+✅ Processing complete
+   Total features: 2156
+   Processed: 2156
+   Errors: 0
+
+💾 Writing output to: pricing_features_processed.json
+✅ Output written successfully
+
+════════════════════════════════════════════════════════════
+  PIPELINE COMPLETE
+════════════════════════════════════════════════════════════
+  ✅ Processed 328 pricing pages
+  ✅ Processed 2156 features
+  📁 Output: pricing_features_processed.json
+════════════════════════════════════════════════════════════
+```
+
+## Complete Workflow
+
+```bash
+# 1. Install Python dependencies
+pip3 install -r requirements.txt
+
+# 2. Fetch pricing features from API
+python3 fetch_pricing_features.py
+# Output: pricing_features_output.json
+
+# 3. Install Node.js dependencies (from parent directory)
+cd "../../"
+npm install
+cd "validate-ast/generate-markdown"
+
+# 4. Process features through markdown pipeline
+node process_features_pipeline.js
+# Output: pricing_features_processed.json
+```
+
+## Troubleshooting Pipeline
+
+### Error: Cannot find module 'unified'
+
+The pipeline requires Node.js packages. Install them from the `md to AST` directory:
+
+```bash
+cd "../../"
+npm install
+cd "validate-ast/generate-markdown"
+node process_features_pipeline.js
+```
+
+### Error: Cannot find '../lib/format-markdown.js'
+
+Make sure you're running the script from the `generate-markdown` folder, and the parent directory structure is intact.
+
+### Features with errors in output
+
+Check the `error` field in the output JSON for features that failed processing. Common issues:
+- Invalid markdown syntax
+- Unrecognized markdown patterns
+- Empty or malformed feature strings
+
