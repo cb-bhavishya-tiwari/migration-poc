@@ -207,6 +207,9 @@ async function main() {
 
   // Step 2: Preprocess
   const normalizedMarkdown = preprocess(rawMarkdown);
+  console.log('normalizedMarkdown below');
+  console.log(normalizedMarkdown);
+  console.log('normalizedMarkdown above');
 
   // Step 3: Create processor
   const processor = createProcessor();
