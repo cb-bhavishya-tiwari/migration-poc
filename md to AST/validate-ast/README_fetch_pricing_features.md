@@ -233,11 +233,11 @@ The `process_features_pipeline.js` script processes each feature through a compl
       "features": {
         "feat1": {
           "rawMD": "# What's included\n\n...",
-          "ASTtoMD": "# What's included\n\n..."
+          "astMD": "# What's included\n\n..."
         },
         "feat2": {
           "rawMD": "# What's included\n\n...",
-          "ASTtoMD": "# What's included\n\n..."
+          "astMD": "# What's included\n\n..."
         }
       }
     }
@@ -287,12 +287,12 @@ node process_features_pipeline.js custom-features.json
 
 The pipeline creates `pricing_features_processed.json` with:
 - **rawMD**: Feature text after `formatMarkdown()` preprocessing
-- **ASTtoMD**: Feature text after AST conversion (roundtrip)
+- **astMD**: Feature text after AST conversion (roundtrip)
 
 ## Use Cases
 
 ### 1. Validation
-Compare `rawMD` vs `ASTtoMD` to ensure AST conversion preserves markdown structure:
+Compare `rawMD` vs `astMD` to ensure AST conversion preserves markdown structure:
 
 ```bash
 node process_features_pipeline.js
@@ -351,14 +351,132 @@ python3 fetch_pricing_features.py
 # Output: pricing_features_output.json
 
 # 3. Install Node.js dependencies (from parent directory)
-cd "../../"
+cd "../"
 npm install
-cd "validate-ast/generate-markdown"
+npm install remark-html
+cd "validate-ast"
 
 # 4. Process features through markdown pipeline
 node process_features_pipeline.js
 # Output: pricing_features_processed.json
+
+# 5. Compare HTML output from rawMD vs astMD
+node compare_html_output.js
+# Output: html_comparison_results.json & html_comparison_report.md
 ```
+
+---
+
+# HTML Comparison Tool
+
+After processing features through the pipeline, you can validate that the HTML rendering is identical for both `rawMD` and `astMD` versions.
+
+## What It Does
+
+The `compare_html_output.js` script:
+
+1. **Reads** `pricing_features_processed.json`
+2. **Renders** both `rawMD` and `astMD` to HTML using `remark-html`
+3. **Compares** the HTML output to check if they're identical
+4. **Flags** any features where HTML rendering differs
+5. **Generates** a detailed report with examples
+
+## Why This Matters
+
+Even if markdown text looks different (e.g., `---` vs `***` for horizontal rules), they should render to the **same HTML**. This tool validates that the AST conversion preserves the visual output.
+
+## How to Run
+
+```bash
+# Run comparison on default input
+node compare_html_output.js
+
+# Or specify custom input
+node compare_html_output.js custom-processed-features.json
+```
+
+## Output Files
+
+### 1. `html_comparison_results.json`
+
+Complete comparison data in JSON format with all HTML outputs and comparison details.
+
+### 2. `html_comparison_report.md`
+
+Human-readable markdown report with:
+- Summary statistics (total features, flagged count, percentages)
+- List of all flagged features with differences
+- Side-by-side comparison of markdown and HTML
+- Specific differences highlighted
+
+## Example Report
+
+```markdown
+# HTML Comparison Report: rawMD vs astMD
+
+## Summary
+
+- **Total Pricing Pages**: 328
+- **Total Features**: 2157
+- **Flagged Features**: 5 (0.23%)
+- **Identical Features**: 2152 (99.77%)
+
+## ✅ All Features Identical!
+
+All features rendered identically from both rawMD and astMD.
+No issues detected - the AST conversion preserves markdown rendering perfectly.
+```
+
+Or if there are differences:
+
+```markdown
+## ⚠️ Flagged Features
+
+### Pricing Page: `01JXJE4HENFW7A51F6QP80G4QY`
+
+#### 1. Feature: `feat2`
+
+**Comparison**:
+- Raw HTML length: 1234 chars
+- AST HTML length: 1240 chars  
+- Difference: 6 chars
+
+**Raw Markdown** (excerpt)
+**AST Markdown** (excerpt)
+**Raw HTML** (excerpt)
+**AST HTML** (excerpt)
+```
+
+## Interpreting Results
+
+### ✅ Identical (Goal: 99%+)
+When features are identical:
+- AST conversion preserves markdown structure perfectly
+- Both versions render the same visual output
+- Safe to migrate to AST-based storage
+
+### ⚠️ Flagged Features
+If features are flagged, review the report to check:
+- Is it just whitespace differences? (Usually harmless)
+- HTML entity encoding differences? (e.g., `&amp;` vs `&`)
+- Structural differences that affect rendering?
+- Edge cases in markdown syntax?
+
+## Common Differences (Usually Harmless)
+
+1. **Whitespace normalization** - Extra spaces/newlines
+2. **Horizontal rules** - `<hr>` rendered same way regardless
+3. **List formatting** - Different HTML structure but same visual output
+4. **Link formatting** - URL encoding differences
+
+## Common Differences (Need Attention)
+
+1. **Missing content** - Text dropped during conversion
+2. **Different heading levels** - `<h1>` vs `<h2>`
+3. **Broken links** - `<a>` tags malformed
+4. **Lost formatting** - Bold/italic not preserved
+
+---
 
 ## Troubleshooting Pipeline
 

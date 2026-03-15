@@ -35,7 +35,7 @@ pricing_features_processed.json (1.4 MB)
 - **Process**:
   - Applies `formatMarkdown()` to normalize markdown (rawMD)
   - Parses to AST using unified/remark
-  - Converts AST back to markdown (ASTtoMD)
+  - Converts AST back to markdown (astMD)
 - **Output**: JSON with both versions for comparison
 
 ## Output Format
@@ -56,7 +56,7 @@ pricing_features_processed.json (1.4 MB)
       "features": {
         "feat1": {
           "rawMD": "# What's included\n\n---\n\n✅ Basic Membership\n\n---",
-          "ASTtoMD": "# What's included\n\n***\n\n✅ Basic Membership\n\n***\n"
+          "astMD": "# What's included\n\n***\n\n✅ Basic Membership\n\n***\n"
         }
       }
     }
@@ -122,7 +122,7 @@ node process_features_pipeline.js
 1. **API Data Extraction**: Bulk fetch pricing page features from Chargebee
 2. **Markdown Validation**: Test if features survive AST conversion
 3. **Migration Testing**: Validate markdown before migrating to AST-based storage
-4. **Debugging**: Compare rawMD vs ASTtoMD to find conversion issues
+4. **Debugging**: Compare rawMD vs astMD to find conversion issues
 
 ## Notes
 

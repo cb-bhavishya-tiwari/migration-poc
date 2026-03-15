@@ -20,8 +20,8 @@ import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 
-import { formatMarkdown } from '../../lib/format-markdown.js';
-import { remarkTooltip } from '../../plugins/remark-tooltip.js';
+import { formatMarkdown } from '../lib/format-markdown.js';
+import { remarkTooltip } from '../plugins/remark-tooltip.js';
 
 // ── Config ─────────────────────────────────────────────────────────
 const INPUT_FILE = process.argv[2] || 'pricing_features_output.json';
@@ -49,7 +49,7 @@ function processFeature(featureString, parseProcessor, stringifyProcessor) {
   if (!featureString || featureString.trim() === '') {
     return {
       rawMD: '',
-      ASTtoMD: '',
+      astMD: '',
     };
   }
 
@@ -61,17 +61,17 @@ function processFeature(featureString, parseProcessor, stringifyProcessor) {
     const ast = parseProcessor.parse(rawMD);
 
     // Step 3: Convert AST back to markdown
-    const ASTtoMD = stringifyProcessor.stringify(ast);
+    const astMD = stringifyProcessor.stringify(ast);
 
     return {
       rawMD,
-      ASTtoMD,
+      astMD,
     };
   } catch (error) {
     console.error(`Error processing feature: ${error.message}`);
     return {
       rawMD: featureString,
-      ASTtoMD: '',
+      astMD: '',
       error: error.message,
     };
   }
@@ -199,8 +199,8 @@ async function main() {
     console.log('rawMD (after formatMarkdown):');
     console.log(firstFeature[1].rawMD.substring(0, 200) + '...');
     console.log();
-    console.log('ASTtoMD (after AST conversion):');
-    console.log(firstFeature[1].ASTtoMD.substring(0, 200) + '...');
+    console.log('astMD (after AST conversion):');
+    console.log(firstFeature[1].astMD.substring(0, 200) + '...');
   }
   console.log('─'.repeat(60));
   console.log();
