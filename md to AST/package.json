@@ -8,11 +8,12 @@
     "migrate:dry": "DRY_RUN=true node migrate.js"
   },
   "dependencies": {
-    "unified": "^11.0.4",
+    "@emoji-mart/data": "^1.2.1",
+    "remark-gfm": "^4.0.0",
+    "remark-html": "^16.0.1",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
-    "remark-gfm": "^4.0.0",
-    "unist-util-visit": "^5.0.0",
-    "@emoji-mart/data": "^1.2.1"
+    "unified": "^11.0.4",
+    "unist-util-visit": "^5.0.0"
   }
 }
