@@ -1,0 +1,18 @@
+{
+  "name": "markdown-to-ast-migration",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Migration pipeline: Database markdown → preprocessed markdown → MDAST (JSON)",
+  "scripts": {
+    "migrate": "node migrate.js",
+    "migrate:dry": "DRY_RUN=true node migrate.js"
+  },
+  "dependencies": {
+    "unified": "^11.0.4",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "remark-gfm": "^4.0.0",
+    "unist-util-visit": "^5.0.0",
+    "@emoji-mart/data": "^1.2.1"
+  }
+}

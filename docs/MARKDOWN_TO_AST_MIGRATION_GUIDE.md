@@ -1312,7 +1312,7 @@ Let's walk through a **complete real-world example** showing how your actual dat
 This is what's actually stored in your database:
 
 ```javascript
-const rawFromDB = "![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)\n\nThis is **a parrot**\n\nIs *this a **parror***\n\n*I am a* [tooltip]{Toolyip wala texr}\n\n1. 🤣😍 I am 1\n\n2. sdsdasdasdasdas\n\n3. asdsadsadsadas\n\n4. sadasdasdsadsad **asdadssadasd**\n\n5. [sadasdasd](https://google.com)\n\n> axaxaxa[xaxax]{Tooltip text}\n\naxs\n\n![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)"
+const rawFromDB = "![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)\n\nThis is **a bold**\n\nIs *this a **italic and bold***\n\n*I am a* [tooltip]{Toolyip wala texr}\n\n1. 🤣😍 I am 1\n\n2. This is *2 italic*\n\n3. This is ~~3 deleted~~\n\nThis is *a link in* [italic](https://google.com)\n\n# this is a heading\n\n- Bullet list point 1\n- Bulet list point 2\n\n> This is code in [tooltip]{Tooltip text} and [lnk]{Tooltip text}\n\n![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)"
 ```
 
 When rendered as markdown, this becomes:
@@ -1320,25 +1320,26 @@ When rendered as markdown, this becomes:
 ```markdown
 ![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)
 
-This is **a parrot**
+This is **a bold**
 
-Is *this a **parror***
+Is *this a **italic and bold***
 
 *I am a* [tooltip]{Toolyip wala texr}
 
 1. 🤣😍 I am 1
 
-2. sdsdasdasdasdas
+2. This is *2 italic*
 
-3. asdsadsadsadas
+3. This is ~~3 deleted~~
 
-4. sadasdasdsadsad **asdadssadasd**
+This is *a link in* [italic](https://google.com)
 
-5. [sadasdasd](https://google.com)
+# this is a heading
 
-> axaxaxa[xaxax]{Tooltip text}
+- Bullet list point 1
+- Bulet list point 2
 
-axs
+> This is code in [tooltip]{Tooltip text} and [lnk]{Tooltip text}
 
 ![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)
 ```
@@ -1359,25 +1360,26 @@ const normalized = formatMarkdown(rawFromDB)
 ```markdown
 ![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)
 
-This is **a parrot**
+This is **a bold**
 
-Is *this a **parror***
+Is *this a **italic and bold***
 
 *I am a* [tooltip]{Toolyip wala texr}
 
 1. 🤣😍 I am 1
 
-2. sdsdasdasdasdas
+2. This is *2 italic*
 
-3. asdsadsadsadas
+3. This is ~~3 deleted~~
 
-4. sadasdasdsadsad **asdadssadasd**
+This is *a link in* [italic](https://google.com)
 
-5. [sadasdasd](https://google.com)
+# this is a heading
 
-> axaxaxa[xaxax]{Tooltip text}
+- Bullet list point 1
+- Bulet list point 2
 
-axs
+> This is code in [tooltip]{Tooltip text} and [lnk]{Tooltip text}
 
 ![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)
 ```
@@ -1427,7 +1429,7 @@ Here's the complete AST output with **annotations** explaining each part:
       ]
     },
     
-    // 2. "This is **a parrot**"
+    // 2. "This is **a bold**"
     {
       "type": "paragraph",
       "children": [
@@ -1440,14 +1442,14 @@ Here's the complete AST output with **annotations** explaining each part:
           "children": [
             {
               "type": "text",
-              "value": "a parrot"
+              "value": "a bold"
             }
           ]
         }
       ]
     },
     
-    // 3. "Is *this a **parror***" (nested emphasis + strong)
+    // 3. "Is *this a **italic and bold***" (nested emphasis + strong)
     {
       "type": "paragraph",
       "children": [
@@ -1467,7 +1469,7 @@ Here's the complete AST output with **annotations** explaining each part:
               "children": [
                 {
                   "type": "text",
-                  "value": "parror"
+                  "value": "italic and bold"
                 }
               ]
             }
@@ -1501,7 +1503,7 @@ Here's the complete AST output with **annotations** explaining each part:
       ]
     },
     
-    // 5. Ordered List (numbered)
+    // 5. Ordered List (numbered 1-3)
     {
       "type": "list",
       "ordered": true,
@@ -1524,7 +1526,7 @@ Here's the complete AST output with **annotations** explaining each part:
             }
           ]
         },
-        // List item 2: "sdsdasdasdasdas"
+        // List item 2: "This is *2 italic*"
         {
           "type": "listItem",
           "spread": false,
@@ -1534,46 +1536,14 @@ Here's the complete AST output with **annotations** explaining each part:
               "children": [
                 {
                   "type": "text",
-                  "value": "sdsdasdasdasdas"
-                }
-              ]
-            }
-          ]
-        },
-        // List item 3: "asdsadsadsadas"
-        {
-          "type": "listItem",
-          "spread": false,
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "asdsadsadsadas"
-                }
-              ]
-            }
-          ]
-        },
-        // List item 4: "sadasdasdsadsad **asdadssadasd**"
-        {
-          "type": "listItem",
-          "spread": false,
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "sadasdasdsadsad "
+                  "value": "This is "
                 },
                 {
-                  "type": "strong",
+                  "type": "emphasis",
                   "children": [
                     {
                       "type": "text",
-                      "value": "asdadssadasd"
+                      "value": "2 italic"
                     }
                   ]
                 }
@@ -1581,7 +1551,7 @@ Here's the complete AST output with **annotations** explaining each part:
             }
           ]
         },
-        // List item 5: "[sadasdasd](https://google.com)"
+        // List item 3: "This is ~~3 deleted~~" (strikethrough via remark-gfm)
         {
           "type": "listItem",
           "spread": false,
@@ -1590,12 +1560,15 @@ Here's the complete AST output with **annotations** explaining each part:
               "type": "paragraph",
               "children": [
                 {
-                  "type": "link",      // Standard markdown link
-                  "url": "https://google.com",
+                  "type": "text",
+                  "value": "This is "
+                },
+                {
+                  "type": "delete",    // ~~strikethrough~~ from remark-gfm
                   "children": [
                     {
                       "type": "text",
-                      "value": "sadasdasd"
+                      "value": "3 deleted"
                     }
                   ]
                 }
@@ -1606,7 +1579,92 @@ Here's the complete AST output with **annotations** explaining each part:
       ]
     },
     
-    // 6. Blockquote with tooltip INSIDE it
+    // 6. "This is *a link in* [italic](https://google.com)" (italic + link)
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "This is "
+        },
+        {
+          "type": "emphasis",         // *a link in*
+          "children": [
+            {
+              "type": "text",
+              "value": "a link in"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "value": " "
+        },
+        {
+          "type": "link",             // [italic](url)
+          "url": "https://google.com",
+          "children": [
+            {
+              "type": "text",
+              "value": "italic"
+            }
+          ]
+        }
+      ]
+    },
+    
+    // 7. "# this is a heading"
+    {
+      "type": "heading",
+      "depth": 1,                     // # = h1
+      "children": [
+        {
+          "type": "text",
+          "value": "this is a heading"
+        }
+      ]
+    },
+    
+    // 8. Unordered List (bullet points)
+    {
+      "type": "list",
+      "ordered": false,               // Bullet list (not numbered)
+      "spread": false,
+      "children": [
+        {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Bullet list point 1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Bulet list point 2"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    
+    // 9. Blockquote with TWO tooltips INSIDE it
     {
       "type": "blockquote",           // > quote
       "children": [
@@ -1615,11 +1673,20 @@ Here's the complete AST output with **annotations** explaining each part:
           "children": [
             {
               "type": "text",
-              "value": "axaxaxa"
+              "value": "This is code in "
             },
             {
-              "type": "tooltip",      // ← Tooltip INSIDE blockquote!
-              "text": "xaxax",
+              "type": "tooltip",      // ← First tooltip INSIDE blockquote!
+              "text": "tooltip",
+              "tooltip": "Tooltip text"
+            },
+            {
+              "type": "text",
+              "value": " and "
+            },
+            {
+              "type": "tooltip",      // ← Second tooltip INSIDE blockquote!
+              "text": "lnk",
               "tooltip": "Tooltip text"
             }
           ]
@@ -1627,18 +1694,7 @@ Here's the complete AST output with **annotations** explaining each part:
       ]
     },
     
-    // 7. Plain text paragraph "axs"
-    {
-      "type": "paragraph",
-      "children": [
-        {
-          "type": "text",
-          "value": "axs"
-        }
-      ]
-    },
-    
-    // 8. Second Image
+    // 10. Second Image
     {
       "type": "paragraph",
       "children": [
@@ -1661,11 +1717,15 @@ This example showcases:
 ✅ **Images** - Standard markdown `![alt](url)` → `image` nodes  
 ✅ **Bold text** - `**text**` → `strong` nodes  
 ✅ **Italic text** - `*text*` → `emphasis` nodes  
+✅ **Strikethrough** - `~~text~~` → `delete` nodes (via `remark-gfm`)  
 ✅ **Nested formatting** - `*this a **bold***` → nested `emphasis` > `strong`  
 ✅ **Custom tooltips** - `[text]{tooltip}` → custom `tooltip` nodes  
+✅ **Multiple tooltips in blockquote** - Two tooltips parsed inside a single blockquote  
 ✅ **Emoji unicode** - `🤣😍` preserved as text values  
 ✅ **Ordered lists** - `1. item` → `list` (ordered: true) with `listItem` children  
+✅ **Unordered lists** - `- item` → `list` (ordered: false) with bullet points  
 ✅ **Links** - `[text](url)` → `link` nodes  
+✅ **Headings** - `# text` → `heading` node (depth: 1)  
 ✅ **Blockquotes** - `> text` → `blockquote` nodes  
 ✅ **Tooltip in blockquote** - Custom syntax works inside standard markdown structures  
 
@@ -1681,7 +1741,7 @@ import {remarkTooltip} from './plugins/remark-tooltip.js'
 import {formatMarkdown} from './src/client/lib/markdown-helper.js'
 
 async function migrateComplexExample() {
-  const rawFromDB = "![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)\n\nThis is **a parrot**\n\nIs *this a **parror***\n\n*I am a* [tooltip]{Toolyip wala texr}\n\n1. 🤣😍 I am 1\n\n2. sdsdasdasdasdas\n\n3. asdsadsadsadas\n\n4. sadasdasdsadsad **asdadssadasd**\n\n5. [sadasdasd](https://google.com)\n\n> axaxaxa[xaxax]{Tooltip text}\n\naxs\n\n![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)"
+  const rawFromDB = "![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)\n\nThis is **a bold**\n\nIs *this a **italic and bold***\n\n*I am a* [tooltip]{Toolyip wala texr}\n\n1. 🤣😍 I am 1\n\n2. This is *2 italic*\n\n3. This is ~~3 deleted~~\n\nThis is *a link in* [italic](https://google.com)\n\n# this is a heading\n\n- Bullet list point 1\n- Bulet list point 2\n\n> This is code in [tooltip]{Tooltip text} and [lnk]{Tooltip text}\n\n![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)"
   
   console.log('=== STEP 1: Raw from Database ===')
   console.log(rawFromDB)
@@ -1714,6 +1774,11 @@ async function migrateComplexExample() {
   console.log('✅ Has ordered list:', ast.children.some(n => 
     n.type === 'list' && n.ordered === true
   ))
+  console.log('✅ Has unordered list:', ast.children.some(n => 
+    n.type === 'list' && n.ordered === false
+  ))
+  console.log('✅ Has heading:', ast.children.some(n => n.type === 'heading'))
+  console.log('✅ Has strikethrough:', JSON.stringify(ast).includes('"type":"delete"'))
   
   return ast
 }
@@ -1725,24 +1790,27 @@ migrateComplexExample()
 ### Visual Breakdown: What Goes Where
 
 ```
-Raw Markdown                          →  MDAST Node Type
-─────────────────────────────────────────────────────────────────
-![aa](url)                            →  paragraph > image
-This is **a parrot**                  →  paragraph > text + strong
-Is *this a **parror***                →  paragraph > text + emphasis > strong
-*I am a* [tooltip]{text}              →  paragraph > emphasis + tooltip (custom!)
-1. 🤣😍 I am 1                        →  list (ordered) > listItem > paragraph
-5. [link](url)                        →  list > listItem > paragraph > link
-> axaxaxa[xaxax]{Tooltip text}        →  blockquote > paragraph > text + tooltip
-axs                                   →  paragraph > text
-![aa](url)                            →  paragraph > image
+Raw Markdown                                    →  MDAST Node Type
+───────────────────────────────────────────────────────────────────────
+![aa](url)                                      →  paragraph > image
+This is **a bold**                              →  paragraph > text + strong
+Is *this a **italic and bold***                 →  paragraph > text + emphasis > strong
+*I am a* [tooltip]{text}                        →  paragraph > emphasis + tooltip (custom!)
+1. 🤣😍 I am 1                                  →  list (ordered) > listItem > paragraph
+2. This is *2 italic*                           →  list (ordered) > listItem > paragraph > emphasis
+3. This is ~~3 deleted~~                        →  list (ordered) > listItem > paragraph > delete
+This is *a link in* [italic](url)               →  paragraph > emphasis + link
+# this is a heading                             →  heading (depth: 1)
+- Bullet list point 1                           →  list (unordered) > listItem > paragraph
+> This is code in [tooltip]{text} and [lnk]{text} →  blockquote > paragraph > text + tooltip + tooltip
+![aa](url)                                      →  paragraph > image
 ```
 
 ### Important Notes
 
-#### 1. Tooltip Inside Blockquote
+#### 1. Multiple Tooltips Inside Blockquote
 
-Notice that `> axaxaxa[xaxax]{Tooltip text}` creates:
+Notice that `> This is code in [tooltip]{Tooltip text} and [lnk]{Tooltip text}` creates a blockquote with **TWO tooltips** inside:
 
 ```json
 {
@@ -1751,19 +1819,21 @@ Notice that `> axaxaxa[xaxax]{Tooltip text}` creates:
     {
       "type": "paragraph",
       "children": [
-        {"type": "text", "value": "axaxaxa"},
-        {"type": "tooltip", "text": "xaxax", "tooltip": "Tooltip text"}
+        {"type": "text", "value": "This is code in "},
+        {"type": "tooltip", "text": "tooltip", "tooltip": "Tooltip text"},
+        {"type": "text", "value": " and "},
+        {"type": "tooltip", "text": "lnk", "tooltip": "Tooltip text"}
       ]
     }
   ]
 }
 ```
 
-**The tooltip plugin works INSIDE other markdown structures!** This is because micromark processes inline content (like tooltips) within block structures (like blockquotes).
+**The tooltip plugin works INSIDE other markdown structures!** This is because micromark processes inline content (like tooltips) within block structures (like blockquotes). You can have multiple tooltips in the same line.
 
 #### 2. Nested Formatting
 
-The text `*this a **parror***` shows **nested** emphasis and strong:
+The text `*this a **italic and bold***` shows **nested** emphasis and strong:
 
 ```json
 {
@@ -1773,16 +1843,31 @@ The text `*this a **parror***` shows **nested** emphasis and strong:
     {
       "type": "strong",
       "children": [
-        {"type": "text", "value": "parror"}
+        {"type": "text", "value": "italic and bold"}
       ]
     }
   ]
 }
 ```
 
-MDAST naturally handles nesting!
+MDAST naturally handles nesting! Bold can be inside italic, and vice versa.
 
-#### 3. Emoji Preservation
+#### 3. Strikethrough via remark-gfm
+
+The text `~~3 deleted~~` requires `remark-gfm` plugin:
+
+```json
+{
+  "type": "delete",
+  "children": [
+    {"type": "text", "value": "3 deleted"}
+  ]
+}
+```
+
+**Without `remark-gfm`, strikethrough won't be parsed!** Make sure to include it in your processor.
+
+#### 4. Emoji Preservation
 
 Native emojis `🤣😍` are preserved as unicode text:
 
@@ -1795,6 +1880,27 @@ Native emojis `🤣😍` are preserved as unicode text:
 
 No special handling needed - they're just characters!
 
+#### 5. Ordered vs Unordered Lists
+
+```json
+// Ordered list (1. 2. 3.)
+{
+  "type": "list",
+  "ordered": true,  // ← numbered
+  "start": 1,
+  "children": [...]
+}
+
+// Unordered list (- bullet)
+{
+  "type": "list",
+  "ordered": false,  // ← bullets
+  "children": [...]
+}
+```
+
+The `ordered` property tells you which type it is!
+
 ### Testing Your Migration
 
 Use this example to test your migration pipeline:
@@ -1803,7 +1909,7 @@ Use this example to test your migration pipeline:
 // test-complex-migration.js
 import {migrateMarkdownToAST} from './migrate-markdown-to-ast.js'
 
-const testCase = "![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)\n\nThis is **a parrot**\n\nIs *this a **parror***\n\n*I am a* [tooltip]{Toolyip wala texr}\n\n1. 🤣😍 I am 1\n\n2. sdsdasdasdasdas\n\n3. asdsadsadsadas\n\n4. sadasdasdsadsad **asdadssadasd**\n\n5. [sadasdasd](https://google.com)\n\n> axaxaxa[xaxax]{Tooltip text}\n\naxs\n\n![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)"
+const testCase = "![aa](https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740&q=80)\n\nThis is **a bold**\n\nIs *this a **italic and bold***\n\n*I am a* [tooltip]{Toolyip wala texr}\n\n1. 🤣😍 I am 1\n\n2. This is *2 italic*\n\n3. This is ~~3 deleted~~\n\nThis is *a link in* [italic](https://google.com)\n\n# this is a heading\n\n- Bullet list point 1\n- Bulet list point 2\n\n> This is code in [tooltip]{Tooltip text} and [lnk]{Tooltip text}\n\n![aa](https://m.media-amazon.com/images/I/51MTPvUBZNL.jpg)"
 
 async function test() {
   const ast = await migrateMarkdownToAST(testCase)
@@ -1813,10 +1919,13 @@ async function test() {
     hasImages: JSON.stringify(ast).includes('"type":"image"'),
     hasTooltips: JSON.stringify(ast).includes('"type":"tooltip"'),
     hasBlockquote: JSON.stringify(ast).includes('"type":"blockquote"'),
-    hasList: JSON.stringify(ast).includes('"type":"list"'),
+    hasOrderedList: JSON.stringify(ast).includes('"ordered":true'),
+    hasUnorderedList: JSON.stringify(ast).includes('"ordered":false'),
+    hasHeading: JSON.stringify(ast).includes('"type":"heading"'),
     hasLinks: JSON.stringify(ast).includes('"type":"link"'),
     hasStrong: JSON.stringify(ast).includes('"type":"strong"'),
     hasEmphasis: JSON.stringify(ast).includes('"type":"emphasis"'),
+    hasStrikethrough: JSON.stringify(ast).includes('"type":"delete"'),
   }
   
   console.log('Migration Test Results:')
@@ -1838,13 +1947,16 @@ test()
 
 Your migration is successful when:
 
-✅ All 8 top-level nodes are present (2 images, 5 paragraphs, 1 list, 1 blockquote)  
-✅ Custom tooltip nodes are created for both `[tooltip]{text}` instances  
-✅ Tooltip inside blockquote is properly nested  
+✅ All 10 top-level nodes are present (2 images, 4 paragraphs, 1 ordered list, 1 heading, 1 unordered list, 1 blockquote)  
+✅ Custom tooltip nodes are created for all 3 `[text]{tooltip}` instances  
+✅ Two tooltips inside blockquote are properly parsed  
 ✅ Nested formatting (emphasis + strong) is preserved  
+✅ Strikethrough from `~~text~~` creates `delete` nodes (via remark-gfm)  
 ✅ Emojis remain as unicode text  
 ✅ Links have proper `url` properties  
-✅ Ordered list has `ordered: true` and 5 list items  
+✅ Ordered list has `ordered: true` with 3 items  
+✅ Unordered list has `ordered: false` with 2 items  
+✅ Heading has `depth: 1` for `#` level  
 
 ---
 
