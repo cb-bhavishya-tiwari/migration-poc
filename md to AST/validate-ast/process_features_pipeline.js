@@ -22,6 +22,7 @@ import { unified } from 'unified';
 
 import { formatMarkdown } from '../lib/format-markdown.js';
 import { remarkTooltip } from '../plugins/remark-tooltip.js';
+import { cleanMDAST } from '../lib/clean-mdast.js';
 
 // ── Config ─────────────────────────────────────────────────────────
 const INPUT_FILE = process.argv[2] || 'pricing_features_output.json';
@@ -50,6 +51,7 @@ function processFeature(featureString, parseProcessor, stringifyProcessor) {
     return {
       rawMD: '',
       astMD: '',
+      cleanedAST: null,
     };
   }
 
@@ -58,20 +60,25 @@ function processFeature(featureString, parseProcessor, stringifyProcessor) {
     const rawMD = formatMarkdown(featureString);
 
     // Step 2: Parse to AST
-    const ast = parseProcessor.parse(rawMD);
+    const rawAst = parseProcessor.parse(rawMD);
 
-    // Step 3: Convert AST back to markdown
-    const astMD = stringifyProcessor.stringify(ast);
+    // Step 3: Clean AST (remove positions and html nodes)
+    const cleanedAST = cleanMDAST(rawAst);
+
+    // Step 4: Convert cleaned AST back to markdown
+    const astMD = stringifyProcessor.stringify(cleanedAST);
 
     return {
       rawMD,
       astMD,
+      cleanedAST,
     };
   } catch (error) {
     console.error(`Error processing feature: ${error.message}`);
     return {
       rawMD: featureString,
       astMD: '',
+      cleanedAST: null,
       error: error.message,
     };
   }

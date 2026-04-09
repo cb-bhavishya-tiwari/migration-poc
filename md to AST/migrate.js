@@ -21,6 +21,7 @@ import { visit } from 'unist-util-visit';
 
 import { formatMarkdown } from './lib/format-markdown.js';
 import { remarkTooltip } from './plugins/remark-tooltip.js';
+import { cleanMDAST, getCleaningStats } from './lib/clean-mdast.js';
 
 // ── Config ─────────────────────────────────────────────────────────
 const DRY_RUN = process.env.DRY_RUN === 'true';
@@ -215,12 +216,22 @@ async function main() {
   const processor = createProcessor();
 
   // Step 4: Parse to AST
-  const ast = parseToAST(processor, normalizedMarkdown);
+  const rawAst = parseToAST(processor, normalizedMarkdown);
 
-  // Step 5: Validate
+  // Step 5: Clean AST (remove positions and html nodes)
+  console.log('🧹 Cleaning AST (removing positions and html nodes)...');
+  const ast = cleanMDAST(rawAst);
+  const cleaningStats = getCleaningStats(rawAst, ast);
+  
+  console.log('✅ AST cleaning complete');
+  console.log(`   Removed ${cleaningStats.removedPositions} position properties`);
+  console.log(`   Removed ${cleaningStats.removedHtmlNodes} html nodes`);
+  console.log(`   Nodes: ${cleaningStats.originalNodes} → ${cleaningStats.cleanedNodes}\n`);
+
+  // Step 6: Validate
   const { unknownTypes } = validateAST(ast);
 
-  // Step 6: Write output
+  // Step 7: Write output
   if (!DRY_RUN) {
     await writeOutput(ast, INPUT_PATH);
   } else {
@@ -228,7 +239,7 @@ async function main() {
     console.log(JSON.stringify(ast, null, 2));
   }
 
-  // Step 7: Roundtrip test
+  // Step 8: Roundtrip test
   roundtripTest(ast);
 
   // Summary

@@ -1,0 +1,213 @@
+{
+  "meta": {
+    "generatedAt": "2026-04-01T08:32:41.126Z",
+    "inputFile": "pricing_features_output.json",
+    "parserPipeline": "formatMarkdown → remark-parse + remark-gfm + remark-tooltip",
+    "pricingPageCount": 328,
+    "featureStringsTotal": 2157,
+    "featureStringsNonEmpty": 2157,
+    "featureStringsParsedOk": 2157,
+    "featureStringsEmptySkipped": 0,
+    "parseErrorCount": 0
+  },
+  "nodeTypes": {
+    "text": 17343,
+    "paragraph": 13713,
+    "listItem": 8367,
+    "root": 2157,
+    "list": 2045,
+    "heading": 1958,
+    "strong": 1682,
+    "blockquote": 1286,
+    "tooltip": 412,
+    "emphasis": 394,
+    "link": 288,
+    "delete": 245,
+    "image": 153,
+    "thematicBreak": 77,
+    "html": 30
+  },
+  "parentChildEdges": {
+    "paragraph→text": 13052,
+    "list→listItem": 8367,
+    "listItem→paragraph": 8365,
+    "root→paragraph": 4062,
+    "root→list": 2045,
+    "root→heading": 1958,
+    "strong→text": 1694,
+    "heading→text": 1662,
+    "paragraph→strong": 1593,
+    "root→blockquote": 1286,
+    "blockquote→paragraph": 1286,
+    "paragraph→tooltip": 405,
+    "emphasis→text": 390,
+    "paragraph→emphasis": 343,
+    "paragraph→link": 288,
+    "link→text": 288,
+    "delete→text": 257,
+    "paragraph→delete": 245,
+    "paragraph→image": 135,
+    "heading→strong": 85,
+    "root→thematicBreak": 77,
+    "paragraph→html": 30,
+    "heading→image": 18,
+    "delete→emphasis": 18,
+    "heading→emphasis": 18,
+    "strong→emphasis": 15,
+    "heading→tooltip": 7,
+    "emphasis→strong": 4
+  },
+  "propertiesByNodeType": {
+    "heading": [
+      "depth"
+    ],
+    "text": [
+      "value"
+    ],
+    "list": [
+      "ordered",
+      "spread",
+      "start"
+    ],
+    "listItem": [
+      "checked",
+      "spread"
+    ],
+    "tooltip": [
+      "text",
+      "tooltip"
+    ],
+    "image": [
+      "alt",
+      "title",
+      "url"
+    ],
+    "link": [
+      "title",
+      "url"
+    ],
+    "html": [
+      "value"
+    ]
+  },
+  "treeDepth": {
+    "maxDepthAcrossAllTrees": 6,
+    "perNodeType": {
+      "root": {
+        "minDepth": 0,
+        "maxDepth": 0,
+        "meanDepth": 0,
+        "nodeCount": 2157
+      },
+      "heading": {
+        "minDepth": 1,
+        "maxDepth": 1,
+        "meanDepth": 1,
+        "nodeCount": 1958
+      },
+      "text": {
+        "minDepth": 2,
+        "maxDepth": 6,
+        "meanDepth": 3.2704837686674737,
+        "nodeCount": 17343
+      },
+      "thematicBreak": {
+        "minDepth": 1,
+        "maxDepth": 1,
+        "meanDepth": 1,
+        "nodeCount": 77
+      },
+      "paragraph": {
+        "minDepth": 1,
+        "maxDepth": 3,
+        "meanDepth": 2.313789834463648,
+        "nodeCount": 13713
+      },
+      "strong": {
+        "minDepth": 2,
+        "maxDepth": 4,
+        "meanDepth": 2.8632580261593343,
+        "nodeCount": 1682
+      },
+      "blockquote": {
+        "minDepth": 1,
+        "maxDepth": 1,
+        "meanDepth": 1,
+        "nodeCount": 1286
+      },
+      "emphasis": {
+        "minDepth": 2,
+        "maxDepth": 5,
+        "meanDepth": 2.383248730964467,
+        "nodeCount": 394
+      },
+      "list": {
+        "minDepth": 1,
+        "maxDepth": 1,
+        "meanDepth": 1,
+        "nodeCount": 2045
+      },
+      "listItem": {
+        "minDepth": 2,
+        "maxDepth": 2,
+        "meanDepth": 2,
+        "nodeCount": 8367
+      },
+      "tooltip": {
+        "minDepth": 2,
+        "maxDepth": 4,
+        "meanDepth": 2.4344660194174756,
+        "nodeCount": 412
+      },
+      "image": {
+        "minDepth": 2,
+        "maxDepth": 4,
+        "meanDepth": 2.0392156862745097,
+        "nodeCount": 153
+      },
+      "link": {
+        "minDepth": 2,
+        "maxDepth": 4,
+        "meanDepth": 2.7222222222222223,
+        "nodeCount": 288
+      },
+      "delete": {
+        "minDepth": 3,
+        "maxDepth": 4,
+        "meanDepth": 3.946938775510204,
+        "nodeCount": 245
+      },
+      "html": {
+        "minDepth": 2,
+        "maxDepth": 3,
+        "meanDepth": 2.066666666666667,
+        "nodeCount": 30
+      }
+    }
+  },
+  "inlineMarkLikeTypes": {
+    "strong": 1682,
+    "tooltip": 412,
+    "emphasis": 394,
+    "link": 288,
+    "delete": 245,
+    "image": 153,
+    "html": 30
+  },
+  "gfmAndBlocks": {
+    "headingDepthHistogram": {
+      "1": 1956,
+      "3": 2
+    },
+    "listOrderedVsUnordered": {
+      "unordered": 2045
+    },
+    "fencedCodeLangHistogram": {},
+    "blockquoteNodes": 1286,
+    "tableNodes": 0,
+    "thematicBreakNodes": 77,
+    "definitionNodes": 0,
+    "footnoteDefinitionNodes": 0
+  },
+  "parseErrors": []
+}

@@ -1,0 +1,33 @@
+{
+  "name": "markdown-mdast-pipeline",
+  "version": "1.0.0",
+  "description": "Production-ready pipeline for transforming markdown to clean MDAST",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "test": "node test.js",
+    "demo": "node demo.js",
+    "example": "node example-usage.js",
+    "simple-test": "node simple-test.js",
+    "install-deps": "npm install unified remark-parse remark-gfm @emoji-mart/data"
+  },
+  "keywords": [
+    "markdown",
+    "mdast",
+    "ast",
+    "remark",
+    "unified",
+    "pipeline"
+  ],
+  "author": "Your Team",
+  "license": "MIT",
+  "dependencies": {
+    "unified": "^11.0.4",
+    "remark-parse": "^11.0.0",
+    "remark-gfm": "^4.0.0",
+    "@emoji-mart/data": "^1.1.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
